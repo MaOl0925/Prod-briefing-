@@ -1,0 +1,8 @@
+echo "# Prod-briefing-" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/MaOl0925/Prod-briefing-.git
+git push -u origin main
+https://claude.ai/api/organizations/f14a64e4-0449-4010-a73b-8577d040fbf2/conversations/bf8b94bc-ee36-48ff-8ec5-9c3777fced0d/wiggle/download-file?path=%2Fmnt%2Fuser-data%2Foutputs%2Fproduct-intelligence-brief-experiment%2Findex.html
