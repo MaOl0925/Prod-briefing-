@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Signal — Weekly Product Intelligence</title>
+<title>Clippy — Weekly Product Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
@@ -48,13 +48,13 @@
   /* Reading progress bar (US-006) */
   #progress-track{ position:fixed; top:0; left:0; width:100%; height:3px; background:transparent; z-index:50; }
   #progress-fill{ height:100%; background:var(--blue); width:0%; transition:width .1s linear; }
-  #progress-label{ position:fixed; bottom:18px; right:16px; z-index:50; font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--muted); background:var(--card); padding:4px 9px; border-radius:10px; border:1px solid var(--card-border); opacity:0; transition:opacity .2s ease; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+  #progress-label{ position:fixed; bottom:60px; right:16px; z-index:50; font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--muted); background:var(--card); padding:4px 9px; border-radius:10px; border:1px solid var(--card-border); opacity:0; transition:opacity .2s ease; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
   #progress-label.visible{ opacity:1; }
 
   /* iOS-style theme switch, fixed in its own corner so it's always reachable
      regardless of scroll position or view (US feedback: move out of the
      topbar, which is about plan/upgrade, not display preferences). */
-  #theme-switch-wrap{ position:fixed; top:16px; right:16px; z-index:60; display:flex; align-items:center; gap:7px; background:var(--card); border:1px solid var(--card-border); border-radius:999px; padding:5px 10px 5px 9px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+  #theme-switch-wrap{ position:fixed; bottom:16px; right:16px; z-index:60; display:flex; align-items:center; gap:7px; background:var(--card); border:1px solid var(--card-border); border-radius:999px; padding:5px 10px 5px 9px; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
   #theme-switch-wrap svg{ display:block; }
   .ios-toggle{ position:relative; width:44px; height:25px; border-radius:999px; border:none; cursor:pointer; padding:0; background:#6B7280; transition:background .2s ease; flex-shrink:0; }
   html[data-theme="dark"] .ios-toggle{ background:var(--green); }
@@ -66,15 +66,24 @@
   .sub{ font-size:var(--fs-subhead); color:var(--muted); max-width:52ch; margin-bottom:28px; }
   .sub small{ display:block; font-size:var(--fs-caption); color:var(--faint); margin-top:8px; font-family:'IBM Plex Mono', monospace; }
 
-  .topbar{ display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:28px; flex-wrap:wrap; }
-  .plan-pill{ display:flex; align-items:center; gap:8px; font-family:'IBM Plex Mono', monospace; font-size:var(--fs-meta); color:var(--muted); }
-  .upgrade-btn{ font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:12.5px; letter-spacing:.03em; text-transform:uppercase; border:none; border-radius:6px; padding:8px 14px; cursor:pointer; background:var(--yellow-bright); color:var(--on-accent); box-shadow:0 2px 0 #b8901f; }
 
   /* Reading mode toggle (US-005) */
-  .mode-toggle{ display:inline-flex; border:1px solid var(--card-border); border-radius:8px; overflow:hidden; margin-bottom:28px; }
-  .mode-toggle button{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; letter-spacing:.03em; text-transform:uppercase; background:var(--card); border:none; padding:8px 14px; cursor:pointer; color:var(--muted); border-right:1px solid var(--card-border); }
-  .mode-toggle button:last-child{ border-right:none; }
-  .mode-toggle button.active{ background:var(--emphasis-bg); color:var(--emphasis-text); }
+  html{ scroll-behavior:smooth; }
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+
+  .week-line{ font-family:'IBM Plex Mono', monospace; font-size:var(--fs-meta); color:var(--faint); letter-spacing:.06em; text-transform:uppercase; margin:-4px 0 20px; }
+
+  .jumpto-wrap{ position:sticky; top:0; z-index:40; background:var(--paper); padding:12px 0; margin:0 0 40px; border-bottom:1px solid var(--card-border); }
+  .jumpto-list{ display:flex; gap:8px; list-style:none; margin:0; padding:0; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .jumpto-list::-webkit-scrollbar{ display:none; }
+  .jumpto-list li{ flex-shrink:0; }
+  .jumpto-link{ display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--muted); background:var(--card); border:1px solid var(--card-border); border-radius:14px; padding:6px 13px; text-decoration:none; white-space:nowrap; transition:background .15s ease, color .15s ease; }
+  .jumpto-link.active{ background:var(--emphasis-bg); color:var(--emphasis-text); border-color:var(--emphasis-bg); }
+  @media (min-width:641px){ .jumpto-list{ flex-wrap:wrap; overflow-x:visible; } }
+
+  .jump-section{ scroll-margin-top:70px; }
+  .jump-section:focus-visible{ outline:2px solid var(--blue); outline-offset:4px; border-radius:4px; }
+  .jump-section:focus{ outline:2px solid var(--blue); outline-offset:4px; border-radius:4px; }
 
   .error-card{ border:1px solid var(--ink); background:var(--paper); border-radius:8px; padding:14px 16px; margin-bottom:28px; display:flex; gap:10px; align-items:flex-start; }
   .error-card .t{ font-family:'Space Grotesk', sans-serif; font-weight:600; color:var(--ink); }
@@ -112,14 +121,12 @@
   .exec-brief-item.action{ grid-column:1 / -1; border-top:1px solid #2C3E5C; padding-top:16px; margin-top:4px; font-weight:600; }
 
   /* Visual summary strip (US-035) */
-  .visual-summary{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:48px; }
   .vs-col .vs-label{ font-family:'IBM Plex Mono', monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); margin-bottom:8px; }
   .vs-col ul{ margin:0; padding:0; list-style:none; }
   .vs-col li{ font-size:13px; color:var(--ink); margin-bottom:5px; padding-left:12px; position:relative; }
   .vs-col li:before{ content:"–"; position:absolute; left:0; color:var(--faint); }
 
   /* Scoreboard (US-036) */
-  .scoreboard{ display:flex; flex-wrap:wrap; gap:10px 22px; margin-bottom:48px; }
   .score-item{ display:flex; align-items:center; gap:8px; font-size:14px; }
   .score-item .topic{ font-family:'Space Grotesk', sans-serif; font-weight:600; min-width:100px; }
   .stars{ color:var(--yellow-ink); letter-spacing:1px; font-size:13px; }
@@ -133,7 +140,6 @@
   .callout .txt{ font-size:14.5px; color:var(--ink); }
 
   /* Since last week (US-002) */
-  .since-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
   .since-col .h{ display:flex; align-items:center; gap:6px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px; margin-bottom:10px; }
   .since-col.emerging .h{ color:var(--green); }
   .since-col.declining .h{ color:var(--blue); }
@@ -232,7 +238,7 @@
   .footer-note{ margin-top:56px; text-align:center; font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:var(--faint); letter-spacing:.06em; }
 
   @media (max-width:560px){
-    .exec-brief-grid, .since-grid, .checklist-grid, .visual-summary{ grid-template-columns:1fr; }
+    .exec-brief-grid, .checklist-grid{ grid-template-columns:1fr; }
     .section-block.light{ margin-left:-20px; margin-right:-20px; }
     :root{ --fs-display:34px; --fs-section:22px; }
   }
@@ -263,12 +269,6 @@ function esc(s){
 }
 function iconTag(name, size){ return '<i data-lucide="' + name + '" style="width:' + (size||16) + 'px;height:' + (size||16) + 'px"></i>'; }
 function fmtShort(d){ return new Date(d).toLocaleDateString("en-US", { month:"short", day:"numeric" }); }
-function stars(score){
-  score = Math.max(0, Math.min(5, score||0));
-  let out = "";
-  for(let i=0;i<5;i++) out += i < score ? "★" : '<span class="dim">★</span>';
-  return out;
-}
 
 function getBookmarks(){
   try{ return JSON.parse(localStorage.getItem(LS_BOOKMARKS) || "[]"); }catch(e){ return []; }
@@ -378,7 +378,6 @@ const state = {
   selected: null,
   loading: true,
   error: null,
-  readingMode: "standard",   // executive | standard | deepdive
   expandedTrends: {},        // idx -> bool (progressive disclosure)
   activeFilter: "All",       // personalization filter
   openPro: {}, waitlist: {},
@@ -430,17 +429,27 @@ function render(){
   app.innerHTML = state.view === "brief" && state.selected ? renderBrief(state.selected) : renderHome();
   attachListeners();
   if(window.lucide) lucide.createIcons();
+  setupSectionObserver();
 }
 
-function topbarHtml(){
-  return '<div class="topbar"><span class="plan-pill">' + iconTag("circle",13) + ' Free plan</span><span class="upgrade-btn">Pro coming soon &middot; &pound;5/mo</span></div>';
-}
-
-function modeToggleHtml(){
-  const modes = [["executive","Executive"],["standard","Standard"],["deepdive","Deep Dive"]];
-  return '<div class="mode-toggle">' + modes.map(function(m){
-    return '<button data-mode="' + m[0] + '" class="' + (state.readingMode === m[0] ? "active" : "") + '">' + m[1] + '</button>';
-  }).join("") + '</div>';
+// ---------------------------------------------------------------------------
+// Highlight the current section in the Jump To nav as the reader scrolls
+// (US-009). Re-run after every render since #app's innerHTML is replaced.
+// ---------------------------------------------------------------------------
+let sectionObserver = null;
+function setupSectionObserver(){
+  if(sectionObserver) sectionObserver.disconnect();
+  const sections = document.querySelectorAll(".jump-section");
+  if(!sections.length) return;
+  sectionObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      const link = document.querySelector('.jumpto-link[data-jump="' + entry.target.id + '"]');
+      if(!link) return;
+      if(entry.isIntersecting) link.classList.add("active");
+      else link.classList.remove("active");
+    });
+  }, { rootMargin: "-35% 0px -55% 0px", threshold: 0 });
+  sections.forEach(function(s){ sectionObserver.observe(s); });
 }
 
 function renderHome(){
@@ -449,21 +458,19 @@ function renderHome(){
   const archiveHtml = state.archive.length === 0
     ? '<div class="empty-card">No past briefings yet.</div>'
     : state.archive.map(function(b){
-        return '<button class="prev-item" data-open="' + esc(b.id) + '"><span class="name">Week of ' + esc(fmtShort(b.weekOf)) + '</span><span class="meta">' + esc(b.trendCount == null ? "—" : b.trendCount) + ' trends</span></button>';
+        return '<button class="prev-item" data-open="' + esc(b.id) + '"><span class="name">' + esc(b.weekOf) + '</span><span class="meta">' + esc(b.trendCount == null ? "—" : b.trendCount) + ' trends</span></button>';
       }).join("");
 
   if(state.loading){
-    return '<div class="wrap"><div class="eyebrow">' + iconTag("radio",15) + ' Weekly Intelligence &middot; Product Management</div><h1 class="title">Signal</h1><p class="sub">Loading this week&#39;s briefing…</p></div>';
+    return '<div class="wrap"><div class="eyebrow">' + iconTag("radio",15) + ' Weekly Intelligence &middot; Product Management</div><h1 class="title">Clippy</h1><p class="sub">Loading this week&#39;s briefing…</p></div>';
   }
 
   return '' +
     '<div class="wrap">' +
       '<div class="eyebrow">' + iconTag("radio",15) + ' Weekly Intelligence &middot; Product Management</div>' +
-      '<h1 class="title">Signal</h1>' +
-      '<p class="sub">The conversations, decisions, and signals shaping product this week, read like an editorial brief, not a dashboard.' +
-        '<small>Generated once a week from durable product-management thinking, not a live news feed.</small>' +
-      '</p>' +
-      topbarHtml() +
+      '<h1 class="title">Clippy</h1>' +
+      (state.latestBrief ? '<div class="week-line">Week of ' + esc(state.latestBrief.weekOf) + '</div>' : '') +
+      '<p class="sub">A weekly briefing that turns enduring product thinking and industry trends into clear, actionable insights for product managers.</p>' +
       errorHtml +
       (state.latestBrief ? renderBriefInline(state.latestBrief) : '<div class="empty-card">No briefing published yet, check back soon.</div>') +
       '<div class="divider"></div>' +
@@ -507,7 +514,7 @@ function trendHtml(t, idx){
   const impactC = badgeColor("impact", t.impact);
   const consensusC = badgeColor("consensus", t.consensus);
   const isBookmarked = state.bookmarks.indexOf(t.name) !== -1;
-  const isExpanded = !!state.expandedTrends[idx] || state.readingMode === "deepdive";
+  const isExpanded = !!state.expandedTrends[idx];
   const showFiltered = state.activeFilter !== "All" && (t.relevantTo||[]).indexOf(state.activeFilter) === -1;
 
   const detailHtml = isExpanded ? ('' +
@@ -544,9 +551,20 @@ function trendHtml(t, idx){
         '<span class="tag" style="color:' + consensusC.fg + '">' + esc(t.consensus) + '</span>' +
         (t.relevantTo||[]).map(function(r){ return '<span class="tag">' + esc(r) + '</span>'; }).join("") +
       '</div>' +
-      (state.readingMode !== "deepdive" ? ('<button class="disclosure-toggle" data-expand="' + idx + '">' + iconTag(isExpanded ? "chevron-up" : "chevron-down",12) + ' ' + (isExpanded ? "Show less" : "Read the full analysis") + '</button>') : "") +
+      ('<button class="disclosure-toggle" data-expand="' + idx + '">' + iconTag(isExpanded ? "chevron-up" : "chevron-down",12) + ' ' + (isExpanded ? "Show less" : "Read the full analysis") + '</button>') +
       detailHtml +
     '</div>';
+}
+
+function jumpToHtml(){
+  const items = [
+    ["top-trends","Top Trends"], ["checklist","Checklist"], ["leaders","Leaders"],
+    ["ai-landscape","AI"], ["companies","Companies"], ["ignore-this","Ignore This"],
+    ["predictions","Predictions"], ["three-things","Three Things"], ["reading-list","Reading"]
+  ];
+  return '<nav class="jumpto-wrap" aria-label="Jump to section"><ul class="jumpto-list">' + items.map(function(it){
+    return '<li><a class="jumpto-link" data-jump="' + it[0] + '" href="#' + it[0] + '">' + esc(it[1]) + '</a></li>';
+  }).join("") + '</ul></nav>';
 }
 
 function renderBriefInline(b){
@@ -565,31 +583,6 @@ function renderBriefInline(b){
         '<div class="exec-brief-item action"><div class="label">Recommended action</div><div class="val">' + esc(b.executiveBrief.recommendedAction) + '</div></div>' +
       '</div>' +
     '</div>') : "";
-
-  const vs = b.visualSummary || {};
-  const visualSummaryHtml = (vs.hot || vs.cooling || vs.companyMoves || vs.aiDevelopments) ? ('' +
-    '<div class="visual-summary">' +
-      vsCol("Hot", vs.hot) + vsCol("Cooling", vs.cooling) + vsCol("Company moves", vs.companyMoves) + vsCol("AI developments", vs.aiDevelopments) +
-    '</div>') : "";
-
-  const scoreboardHtml = (b.scoreboard || []).length ? ('' +
-    '<div class="scoreboard">' + (b.scoreboard || []).map(function(s){
-      return '<div class="score-item"><span class="topic">' + esc(s.topic) + '</span><span class="stars">' + stars(s.score) + '</span></div>';
-    }).join("") + '</div>') : "";
-
-  const narrative = b.narrativeSummary || "";
-  const drop = narrative[0] || "";
-  const rest = narrative.slice(1);
-  const narrativeHtml = narrative ? ('<p class="narrative"><span class="drop">' + esc(drop) + '</span>' + esc(rest) + '</p>') : "";
-
-  const calloutHtml = b.notableCallout ? ('<div class="callout"><div class="type">' + esc(b.notableCallout.type) + '</div><div class="txt">' + esc(b.notableCallout.text) + '</div></div>') : "";
-
-  const slw = b.sinceLastWeek;
-  const sinceHtml = (slw && slw.hasPreviousWeek) ? ('' +
-    sectionOpen("Since Last Week") +
-    '<div class="since-grid">' +
-      sinceCol("emerging","▲ Emerging", slw.emerging) + sinceCol("declining","▼ Declining", slw.declining) + sinceCol("stable","→ Stable", slw.stable) +
-    '</div>') : (slw ? ('<p style="color:var(--faint);font-style:italic;font-size:14px;">First edition, no previous week to compare against yet.</p>') : "");
 
   const trendsHtml = (b.topTrends || []).map(function(t,i){ return trendHtml(t,i); }).join("");
 
@@ -625,64 +618,29 @@ function renderBriefInline(b){
     return '<a class="read-item" href="' + esc(r.link||"#") + '" target="_blank" rel="noopener noreferrer"><div class="read-top"><div class="read-title">' + (i+1) + '. ' + esc(r.title) + '</div>' + (r.estimatedTime?'<div class="read-time">' + esc(r.estimatedTime) + '</div>':"") + '</div><div class="read-sub">' + (r.source?esc(r.source)+' — ':"") + esc(r.whyItMatters) + '</div></a>';
   }).join("");
 
-  const kicker = 'Week of ' + esc(b.weekOf);
-
   let sectionsHtml = "";
-  const em = state.readingMode === "executive";
-
-  sectionsHtml += modeToggleHtml();
   sectionsHtml += execBriefHtml;
-
-  if(!em){
-    sectionsHtml += '<div class="section-block dense">' + visualSummaryHtml + scoreboardHtml + '</div>';
-  }
-
-  sectionsHtml += '<div class="section-block dense">' + sectionOpen("This Week", kicker) + narrativeHtml + calloutHtml + '</div>';
-
-  if(!em && slw){
-    sectionsHtml += '<div class="section-block light">' + sinceHtml + '</div>';
-  }
-
-  sectionsHtml += '<div class="section-block dense">' + sectionOpen("The Conversations Shaping Product This Week") + filterHtml + trendsHtml + '</div>';
-
-  if(!em){
-    sectionsHtml += '<div class="section-block light">' + sectionOpen("What Influential Product Leaders Are Saying") + leaderHtml + '</div>';
-    sectionsHtml += '<div class="section-block dense">' + sectionOpen("AI Capabilities Worth Watching") + aiHtml + '</div>';
-    sectionsHtml += '<div class="section-block light">' + sectionOpen("What Leading Companies Changed") + lessonsHtml + '</div>';
-    sectionsHtml += ignoreHtml;
-  }
-
-  sectionsHtml += '<div class="section-block dense">' + sectionOpen("Monday Morning Checklist") + checklistHtml + '</div>';
-
-  if(!em){
-    sectionsHtml += '<div class="section-block light">' + sectionOpen("Next Week We&#39;re Watching") + predictionsHtml + '</div>';
-  }
-
-  sectionsHtml += threeThingsHtml;
-
-  if(!em){
-    sectionsHtml += '<div class="section-block dense">' + sectionOpen("Reading / Listening List") + readingHtml + '</div>';
-  }
-
+  sectionsHtml += jumpToHtml();
+  sectionsHtml += '<div id="top-trends" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("The Conversations Shaping Product This Week") + filterHtml + trendsHtml + '</div>';
+  sectionsHtml += '<div id="checklist" tabindex="-1" class="jump-section section-block light">' + sectionOpen("Monday Morning Checklist") + checklistHtml + '</div>';
+  sectionsHtml += '<div id="leaders" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("What Influential Product Leaders Are Saying") + leaderHtml + '</div>';
+  sectionsHtml += '<div id="ai-landscape" tabindex="-1" class="jump-section section-block light">' + sectionOpen("AI Capabilities Worth Watching") + aiHtml + '</div>';
+  sectionsHtml += '<div id="companies" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("What Leading Companies Changed") + lessonsHtml + '</div>';
+  sectionsHtml += '<div id="ignore-this" tabindex="-1" class="jump-section section-block light">' + ignoreHtml + '</div>';
+  sectionsHtml += '<div id="predictions" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("Next Week We&#39;re Watching") + predictionsHtml + '</div>';
+  sectionsHtml += '<div id="three-things" tabindex="-1" class="jump-section">' + threeThingsHtml + '</div>';
+  sectionsHtml += '<div id="reading-list" tabindex="-1" class="jump-section section-block light">' + sectionOpen("Reading / Listening List") + readingHtml + '</div>';
   sectionsHtml += '<div class="footer-note">GENERATED BY AI FROM MODEL KNOWLEDGE &middot; NOT LIVE NEWS &middot; VERIFY BEFORE EXTERNAL SHARE</div>';
 
   return sectionsHtml;
 }
 
-function vsCol(label, items){
-  return '<div class="vs-col"><div class="vs-label">' + esc(label) + '</div><ul>' + (items||[]).map(function(i){ return '<li>' + esc(i) + '</li>'; }).join("") + '</ul></div>';
-}
-function sinceCol(cls, label, items){
-  return '<div class="since-col ' + cls + '"><div class="h">' + esc(label) + '</div>' + (items||[]).map(function(i){
-    return '<div class="since-item"><div class="topic">' + esc(i.topic) + '</div><div class="why">' + esc(i.why) + '</div></div>';
-  }).join("") + '</div>';
-}
 function checklistCol(cls, label, items){
   return '<div class="checklist-col ' + cls + '"><div class="ch-head">' + esc(label) + '</div><ul>' + (items||[]).map(function(i){ return '<li>' + esc(i) + '</li>'; }).join("") + '</ul></div>';
 }
 
 function renderBrief(b){
-  return '<div class="wrap"><button class="back-btn" id="backBtn">' + iconTag("arrow-left",14) + ' Back to home</button>' + topbarHtml() + renderBriefInline(b) + '</div>';
+  return '<div class="wrap"><button class="back-btn" id="backBtn">' + iconTag("arrow-left",14) + ' Back to home</button>' + '<div class="week-line">Week of ' + esc(b.weekOf) + '</div>' + renderBriefInline(b) + '</div>';
 }
 
 // ---------------------------------------------------------------------------
@@ -699,10 +657,6 @@ function attachListeners(){
         state.selected = b; state.view = "brief"; state.error = null; render(); window.scrollTo(0,0);
       }catch(e){ state.error = describeError("open-brief", e.message, e.code); render(); }
     };
-  });
-
-  document.querySelectorAll("[data-mode]").forEach(function(el){
-    el.onclick = function(){ state.readingMode = el.getAttribute("data-mode"); render(); };
   });
 
   document.querySelectorAll("[data-filter]").forEach(function(el){
