@@ -160,6 +160,10 @@
   .trend-top h3{ font-size:var(--fs-headline); font-weight:700; margin:0; }
   .trend-badges{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
   .badge{ font-family:'IBM Plex Mono', monospace; font-size:10px; font-weight:600; letter-spacing:.05em; border-radius:4px; padding:3px 7px; text-transform:uppercase; white-space:nowrap; }
+  .impact-badge{ border:none; cursor:help; font-family:inherit; }
+  .badge-tip-wrap{ position:relative; display:inline-block; }
+  .impact-tooltip{ position:absolute; top:calc(100% + 8px); left:0; z-index:30; width:220px; background:var(--emphasis-bg); color:var(--emphasis-text); font-family:'Source Serif 4',serif; font-size:12.5px; font-weight:400; text-transform:none; letter-spacing:normal; line-height:1.5; padding:10px 12px; border-radius:6px; opacity:0; visibility:hidden; transition:opacity .15s ease; pointer-events:none; }
+  .badge-tip-wrap:hover .impact-tooltip, .badge-tip-wrap:focus-within .impact-tooltip{ opacity:1; visibility:visible; pointer-events:auto; }
   .bookmark-btn{ background:none; border:none; cursor:pointer; color:var(--faint); padding:2px; }
   .bookmark-btn.saved{ color:var(--yellow-ink); }
 
@@ -182,22 +186,6 @@
   .exec-take{ font-size:14px; font-style:italic; color:var(--muted); margin:12px 0; }
   .connection-line{ font-size:12.5px; color:var(--blue); font-family:'IBM Plex Mono', monospace; margin-bottom:10px; }
 
-  /* Pro teaser as contextual preview, appears AFTER value (US-024/025) */
-  .pro-preview{ margin-top:16px; border-top:1px dashed var(--card-border); padding-top:14px; }
-  .pro-preview-link{ display:flex; align-items:center; justify-content:space-between; background:var(--light-tint); border-radius:6px; padding:10px 14px; cursor:pointer; margin-bottom:6px; }
-  .pro-preview-link .txt{ font-size:13.5px; color:var(--ink); }
-  .pro-preview-link .txt b{ font-weight:600; }
-  .pro-panel{ background:var(--card); border:1px dashed var(--card-border); border-left:3px solid var(--yellow-ink); border-radius:6px; padding:14px 16px; margin-top:8px; }
-  .pro-panel .teaser{ font-size:13.5px; color:var(--ink); font-style:italic; margin:0 0 10px; }
-  .pro-panel .teaser-label{ font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--yellow-ink); text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; display:block; }
-  .waitlist-row{ display:flex; gap:8px; flex-wrap:wrap; }
-  .waitlist-row input{ flex:1; min-width:180px; padding:8px 10px; border:1px solid var(--card-border); border-radius:5px; font-family:'IBM Plex Mono', monospace; font-size:12.5px; }
-  .waitlist-row button{ font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:12.5px; background:var(--emphasis-bg); color:var(--emphasis-text); border:none; border-radius:5px; padding:8px 14px; cursor:pointer; white-space:nowrap; }
-  .waitlist-done{ font-size:13px; color:var(--green); font-family:'IBM Plex Mono', monospace; }
-  .waitlist-error{ font-size:12.5px; color:var(--yellow-ink); margin-top:6px; font-weight:600; }
-  .format-row{ display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
-  .format-row button{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; background:var(--card); border:1px solid var(--card-border); border-radius:4px; padding:4px 8px; cursor:pointer; }
-
   /* Flowing (non-card) list items for lower-value content (US-015) */
   .flow-item{ padding:16px 0; border-bottom:1px solid var(--card-border); }
   .flow-item:last-child{ border-bottom:none; }
@@ -206,6 +194,10 @@
   .flow-body{ font-size:14.5px; color:var(--ink); margin:4px 0; }
   .flow-why{ font-size:13px; font-style:italic; color:var(--muted); }
   .flow-meta{ font-family:'IBM Plex Mono', monospace; font-size:var(--fs-meta); color:var(--faint); margin-top:4px; }
+  a.flow-meta{ display:inline-block; text-decoration:none; color:var(--blue); }
+  a.flow-meta:hover{ text-decoration:underline; }
+  .empty-note{ font-size:14px; color:var(--faint); font-style:italic; margin:0; }
+  .section-caveat{ font-size:12px; color:var(--faint); font-style:italic; margin:0 0 14px; }
 
   /* Monday Morning Checklist (US-003) */
   .checklist-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px 28px; }
@@ -216,9 +208,6 @@
   .checklist-col.watch .ch-head{ color:var(--muted); }
   .checklist-col ul{ margin:0; padding-left:18px; }
   .checklist-col li{ font-size:14px; color:var(--ink); margin-bottom:8px; }
-
-  .ignore-this{ background:var(--yellow-chip); border-radius:8px; padding:16px 18px; margin-bottom:48px; }
-  .ignore-this .lbl{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--yellow-ink); margin-bottom:6px; }
 
   .predictions-list{ margin:0; padding-left:20px; }
   .predictions-list li{ font-size:15px; margin-bottom:10px; }
@@ -258,7 +247,7 @@
 // =====================================================================
 // CONFIG
 // =====================================================================
-const PROXY_URL = "https://prod-brief-clippy.dkelly668.workers.dev";
+const PROXY_URL = "https://product-intel-proxy.YOUR-SUBDOMAIN.workers.dev";
 const LS_BOOKMARKS = "signal_bookmarks";
 
 function esc(s){
@@ -372,21 +361,20 @@ function describeError(context, rawMessage, code){
 // App state
 // ---------------------------------------------------------------------------
 const state = {
-  view: "home",
   latestBrief: null,
   archive: [],
-  selected: null,
+  selected: null,            // whichever brief is currently shown; defaults to latest once loaded
   loading: true,
   error: null,
   expandedTrends: {},        // idx -> bool (progressive disclosure)
   activeFilter: "All",       // personalization filter
-  openPro: {}, waitlist: {},
   bookmarks: getBookmarks(),
 };
 
 async function boot(){
   try{
     state.latestBrief = await apiGet("/brief");
+    state.selected = state.latestBrief;
   }catch(e){
     state.error = describeError("load-brief", e.message, e.code);
   }
@@ -411,7 +399,7 @@ function setupProgressTracking(){
     const label = document.getElementById("progress-label");
     if(fill) fill.style.width = pct + "%";
     if(label){
-      if(scrollTop > 80 && state.view === "brief"){
+      if(scrollTop > 80){
         label.textContent = pct + "%";
         label.classList.add("visible");
       } else {
@@ -426,7 +414,7 @@ function setupProgressTracking(){
 // ---------------------------------------------------------------------------
 function render(){
   const app = document.getElementById("app");
-  app.innerHTML = state.view === "brief" && state.selected ? renderBrief(state.selected) : renderHome();
+  app.innerHTML = renderPage();
   attachListeners();
   if(window.lucide) lucide.createIcons();
   setupSectionObserver();
@@ -452,7 +440,7 @@ function setupSectionObserver(){
   sections.forEach(function(s){ sectionObserver.observe(s); });
 }
 
-function renderHome(){
+function renderPage(){
   const errorHtml = state.error ? ('<div class="error-card">' + iconTag("alert-triangle",18) + '<div><div class="t">' + esc(state.error.title) + ' <span class="err-code">' + esc(state.error.code) + '</span></div><div class="m">' + esc(state.error.message) + '</div></div></div>') : "";
 
   const archiveHtml = state.archive.length === 0
@@ -465,14 +453,20 @@ function renderHome(){
     return '<div class="wrap"><div class="eyebrow">' + iconTag("radio",15) + ' Weekly Intelligence &middot; Product Management</div><h1 class="title">Clippy</h1><p class="sub">Loading this week&#39;s briefing…</p></div>';
   }
 
+  const viewingArchived = state.latestBrief && state.selected && state.selected.id !== state.latestBrief.id;
+  const backToLatestHtml = viewingArchived
+    ? '<button class="back-btn" id="backBtn">' + iconTag("arrow-left",14) + ' Back to latest briefing</button>'
+    : '';
+
   return '' +
     '<div class="wrap">' +
+      backToLatestHtml +
       '<div class="eyebrow">' + iconTag("radio",15) + ' Weekly Intelligence &middot; Product Management</div>' +
       '<h1 class="title">Clippy</h1>' +
-      (state.latestBrief ? '<div class="week-line">Week of ' + esc(state.latestBrief.weekOf) + '</div>' : '') +
       '<p class="sub">A weekly briefing that turns enduring product thinking and industry trends into clear, actionable insights for product managers.</p>' +
+      (state.selected ? '<div class="week-line">Week of ' + esc(state.selected.weekOf) + '</div>' : '') +
       errorHtml +
-      (state.latestBrief ? renderBriefInline(state.latestBrief) : '<div class="empty-card">No briefing published yet, check back soon.</div>') +
+      (state.selected ? renderBriefInline(state.selected) : '<div class="empty-card">No briefing published yet, check back soon.</div>') +
       '<div class="divider"></div>' +
       '<div class="section-label">' + iconTag("archive",14) + ' Previous Briefings</div>' +
       archiveHtml +
@@ -491,23 +485,11 @@ function sectionOpen(title, kicker){
   return '<h2 class="section-title">' + esc(title) + '</h2>' + (kicker ? '<div class="section-kicker">' + esc(kicker) + '</div>' : "");
 }
 
-function proPreviewHtml(idx, feature, label){
-  const key = idx + ":" + feature;
-  const isOpen = state.openPro[key];
-  let inner = "";
-  if(isOpen){
-    const wl = state.waitlist[key] || {};
-    let bodyHtml;
-    if(wl.done){
-      bodyHtml = '<div class="waitlist-done">' + iconTag("check",13) + ' Thanks, we&#39;ll email you when this launches.</div>';
-    } else if(feature === "content"){
-      bodyHtml = '<div class="format-row"><button data-format-pick="linkedin" data-idx="' + idx + '">LinkedIn</button><button data-format-pick="slack" data-idx="' + idx + '">Slack</button><button data-format-pick="email" data-idx="' + idx + '">Email</button><button data-format-pick="board" data-idx="' + idx + '">Board update</button></div>';
-    } else {
-      bodyHtml = '<div class="waitlist-row"><input type="email" placeholder="you@company.com" data-wl-input="' + key + '" ' + (wl.submitting?"disabled":"") + ' /><button data-wl-submit="' + key + '" ' + (wl.submitting?"disabled":"") + '>' + (wl.submitting ? "Joining…" : "Notify me") + '</button></div>' + (wl.error ? '<div class="waitlist-error">' + esc(wl.error) + '</div>' : "");
-    }
-    inner = '<div class="pro-panel"><span class="teaser-label">' + esc(label) + ' &middot; coming soon</span><p class="teaser">' + esc(PRO_TEASERS[wl.chosenFormat || feature] || PRO_TEASERS[feature]) + '</p>' + bodyHtml + '</div>';
-  }
-  return '<div class="pro-preview-link" data-toggle-pro="' + feature + '" data-idx="' + idx + '"><span class="txt">' + esc(label) + ' <b>&rarr;</b></span>' + iconTag("sparkles",14) + '</div>' + inner;
+function impactTooltipText(level){
+  return "How impact is assessed: breadth of teams/workflows affected and urgency to act. " +
+    (level === "High" ? "This one is High: broad reach and worth acting on now."
+      : level === "Low" ? "This one is Low: worth knowing, not immediately action-critical."
+      : "This one is Medium: notable, but narrower in reach or less time-sensitive.");
 }
 
 function trendHtml(t, idx){
@@ -516,6 +498,7 @@ function trendHtml(t, idx){
   const isBookmarked = state.bookmarks.indexOf(t.name) !== -1;
   const isExpanded = !!state.expandedTrends[idx];
   const showFiltered = state.activeFilter !== "All" && (t.relevantTo||[]).indexOf(state.activeFilter) === -1;
+  const tipId = "impact-tip-" + idx;
 
   const detailHtml = isExpanded ? ('' +
     '<div class="trend-detail">' +
@@ -528,11 +511,6 @@ function trendHtml(t, idx){
       (t.pullQuote ? '<div class="pull-quote">' + esc(t.pullQuote) + '</div>' : "") +
       (t.contrarian ? '<div class="contra-block"><div class="row"><span class="lbl">Most believe</span>' + esc(t.contrarian.mostBelieve) + '</div><div class="row"><span class="lbl">However</span>' + esc(t.contrarian.however) + '</div><div class="row"><span class="lbl">Our take</span>' + esc(t.contrarian.ourAssessment) + '</div></div>' : "") +
       (t.executiveTake ? '<div class="exec-take">Executive take: ' + esc(t.executiveTake) + '</div>' : "") +
-      '<div class="pro-preview">' +
-        proPreviewHtml(idx, "counter", PRO_LABELS.counter) +
-        proPreviewHtml(idx, "implement", PRO_LABELS.implement) +
-        proPreviewHtml(idx, "content", PRO_LABELS.content) +
-      '</div>' +
     '</div>') : "";
 
   return '' +
@@ -540,8 +518,11 @@ function trendHtml(t, idx){
       '<div class="trend-top">' +
         '<h3>' + esc(t.name) + '</h3>' +
         '<div class="trend-badges">' +
-          '<span class="badge" style="background:' + impactC.bg + ';color:' + impactC.fg + '">' + esc(t.impact) + ' impact</span>' +
-          '<button class="bookmark-btn ' + (isBookmarked?"saved":"") + '" data-bookmark="' + esc(t.name) + '">' + iconTag(isBookmarked ? "bookmark-check" : "bookmark", 15) + '</button>' +
+          '<span class="badge-tip-wrap">' +
+            '<button type="button" class="badge impact-badge" style="background:' + impactC.bg + ';color:' + impactC.fg + '" aria-describedby="' + tipId + '">' + esc(t.impact) + ' impact</button>' +
+            '<span role="tooltip" id="' + tipId + '" class="impact-tooltip">' + esc(impactTooltipText(t.impact)) + '</span>' +
+          '</span>' +
+          '<button class="bookmark-btn ' + (isBookmarked?"saved":"") + '" data-bookmark="' + esc(t.name) + '" aria-label="' + (isBookmarked ? "Remove bookmark" : "Bookmark this trend") + '" aria-pressed="' + isBookmarked + '">' + iconTag(isBookmarked ? "bookmark-check" : "bookmark", 15) + '</button>' +
         '</div>' +
       '</div>' +
       '<p class="trend-oneliner">' + esc(t.oneLineSummary) + '</p>' +
@@ -559,7 +540,8 @@ function trendHtml(t, idx){
 function jumpToHtml(){
   const items = [
     ["top-trends","Top Trends"], ["checklist","Checklist"], ["leaders","Leaders"],
-    ["ai-landscape","AI"], ["companies","Companies"], ["ignore-this","Ignore This"],
+    ["thought-leaders","Thought Leaders"], ["podcasts","Podcasts"],
+    ["ai-landscape","AI"], ["companies","Companies"],
     ["predictions","Predictions"], ["three-things","Three Things"], ["reading-list","Reading"]
   ];
   return '<nav class="jumpto-wrap" aria-label="Jump to section"><ul class="jumpto-list">' + items.map(function(it){
@@ -598,7 +580,17 @@ function renderBriefInline(b){
     return '<div class="flow-item"><div class="flow-name">' + esc(c.company) + '</div><p class="flow-body">' + esc(c.decision) + '</p><p class="flow-why">Lesson: ' + esc(c.lesson) + '</p></div>';
   }).join("");
 
-  const ignoreHtml = b.ignoreThis ? ('<div class="ignore-this"><div class="lbl">Ignore This</div><div style="font-weight:600;margin-bottom:4px;">' + esc(b.ignoreThis.topic) + '</div><div style="font-size:13.5px;">' + esc(b.ignoreThis.reason) + '</div></div>') : "";
+  const thoughtLeaderHtml = (b.thoughtLeaderRoundup || []).length
+    ? (b.thoughtLeaderRoundup || []).map(function(t){
+        return '<div class="flow-item"><div class="flow-name">' + esc(t.person) + '</div><p class="flow-body">' + esc(t.note) + '</p>' + (t.link ? '<a class="flow-meta" href="' + esc(t.link) + '" target="_blank" rel="noopener noreferrer">Read the source &rarr;</a>' : '') + '</div>';
+      }).join("")
+    : '<p class="empty-note">No fresh posts found from these thought leaders this week.</p>';
+
+  const podcastHtml = (b.podcastRoundup || []).length
+    ? '<p class="section-caveat">Based on episode titles and show notes, not full transcripts.</p>' + (b.podcastRoundup || []).map(function(p){
+        return '<div class="flow-item"><div class="flow-name">' + esc(p.show) + '</div><p class="flow-body">' + esc(p.note) + '</p>' + (p.link ? '<a class="flow-meta" href="' + esc(p.link) + '" target="_blank" rel="noopener noreferrer">Listen &rarr;</a>' : '') + '</div>';
+      }).join("")
+    : '<p class="empty-note">No fresh episodes found from these shows this week.</p>';
 
   const checklist = b.monthlyChecklist || {};
   const checklistHtml = '' +
@@ -624,10 +616,11 @@ function renderBriefInline(b){
   sectionsHtml += '<div id="top-trends" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("The Conversations Shaping Product This Week") + filterHtml + trendsHtml + '</div>';
   sectionsHtml += '<div id="checklist" tabindex="-1" class="jump-section section-block light">' + sectionOpen("Monday Morning Checklist") + checklistHtml + '</div>';
   sectionsHtml += '<div id="leaders" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("What Influential Product Leaders Are Saying") + leaderHtml + '</div>';
+  sectionsHtml += '<div id="thought-leaders" tabindex="-1" class="jump-section section-block light">' + sectionOpen("What Thought Leaders Are Saying This Week") + thoughtLeaderHtml + '</div>';
+  sectionsHtml += '<div id="podcasts" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("From the Product Podcasts") + podcastHtml + '</div>';
   sectionsHtml += '<div id="ai-landscape" tabindex="-1" class="jump-section section-block light">' + sectionOpen("AI Capabilities Worth Watching") + aiHtml + '</div>';
   sectionsHtml += '<div id="companies" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("What Leading Companies Changed") + lessonsHtml + '</div>';
-  sectionsHtml += '<div id="ignore-this" tabindex="-1" class="jump-section section-block light">' + ignoreHtml + '</div>';
-  sectionsHtml += '<div id="predictions" tabindex="-1" class="jump-section section-block dense">' + sectionOpen("Next Week We&#39;re Watching") + predictionsHtml + '</div>';
+  sectionsHtml += '<div id="predictions" tabindex="-1" class="jump-section section-block light">' + sectionOpen("Next Week We&#39;re Watching") + predictionsHtml + '</div>';
   sectionsHtml += '<div id="three-things" tabindex="-1" class="jump-section">' + threeThingsHtml + '</div>';
   sectionsHtml += '<div id="reading-list" tabindex="-1" class="jump-section section-block light">' + sectionOpen("Reading / Listening List") + readingHtml + '</div>';
   sectionsHtml += '<div class="footer-note">GENERATED BY AI FROM MODEL KNOWLEDGE &middot; NOT LIVE NEWS &middot; VERIFY BEFORE EXTERNAL SHARE</div>';
@@ -639,22 +632,18 @@ function checklistCol(cls, label, items){
   return '<div class="checklist-col ' + cls + '"><div class="ch-head">' + esc(label) + '</div><ul>' + (items||[]).map(function(i){ return '<li>' + esc(i) + '</li>'; }).join("") + '</ul></div>';
 }
 
-function renderBrief(b){
-  return '<div class="wrap"><button class="back-btn" id="backBtn">' + iconTag("arrow-left",14) + ' Back to home</button>' + '<div class="week-line">Week of ' + esc(b.weekOf) + '</div>' + renderBriefInline(b) + '</div>';
-}
-
 // ---------------------------------------------------------------------------
 // Listeners
 // ---------------------------------------------------------------------------
 function attachListeners(){
   const backBtn = document.getElementById("backBtn");
-  if(backBtn) backBtn.onclick = function(){ state.view = "home"; state.selected = null; render(); window.scrollTo(0,0); };
+  if(backBtn) backBtn.onclick = function(){ state.selected = state.latestBrief; state.error = null; render(); window.scrollTo(0,0); };
 
   document.querySelectorAll("[data-open]").forEach(function(el){
     el.onclick = async function(){
       try{
         const b = await apiGet("/brief/" + el.getAttribute("data-open"));
-        state.selected = b; state.view = "brief"; state.error = null; render(); window.scrollTo(0,0);
+        state.selected = b; state.error = null; render(); window.scrollTo(0,0);
       }catch(e){ state.error = describeError("open-brief", e.message, e.code); render(); }
     };
   });
